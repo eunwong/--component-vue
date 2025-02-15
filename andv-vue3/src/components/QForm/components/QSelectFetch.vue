@@ -1,22 +1,15 @@
 <template>
-  <a-select
-    style="width: 100%"
-    v-model:value="value"
-    showSearch
-    v-bind="$attrs"
-    :filter-option="filterOption"
-    :not-found-content="fetching ? undefined : null"
-    @focus="focusHandle()"
-    @change="(val, data) => changeHandle(val, data)"
-    :getPopupContainer="triggerNode => triggerNode.parentNode"
-    @search="searchOptions"
-    @popupScroll="e => popupScrollHandle(e, $attrs)"
-  >
+  <a-select style="width: 100%" v-model:value="value" showSearch v-bind="$attrs" :filter-option="filterOption"
+    @focus="focusHandle()" @change="(val, data) => changeHandle(val, data)"
+    :getPopupContainer="triggerNode => triggerNode.parentNode" @search="searchOptions"
+    @popupScroll="e => popupScrollHandle(e, $attrs)">
     <template v-for="item in options" :key="item._value_">
-      <a-select-option v-if="item._text_?.toLowerCase().includes(searchValue)" :item="item" :value="item._value_" :text="item._text_">{{ item._text_ }}</a-select-option>
+      <a-select-option v-if="item._text_?.toLowerCase().includes(searchValue)" :item="item" :value="item._value_"
+        :text="item._text_">{{ item._text_ }}</a-select-option>
     </template>
-    <template v-if="fetching" #notFoundContent>
-      <a-spin size="small" />
+    <template #notFoundContent>
+      <a-spin v-if="fetching" size="small" />
+      <a-empty v-if="!fetching" description="暂无数据" />
     </template>
   </a-select>
 </template>
@@ -252,7 +245,8 @@ function render(template, person) {
 function focusHandle() {
   let event = attrs._optionsConfig?.event || [];
   emits('onFocus', value);
-  if (event.includes('focus')) {
+  if (event.includes('focus' && !innerValue.value)) {
+    options.value = [];
     requestOptionsEvent();
   }
 }
